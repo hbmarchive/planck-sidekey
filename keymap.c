@@ -44,7 +44,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [RIGHT_TAP_LAYER] = LAYOUT_planck_grid(
     KC_TRNS,  KC_EXLM,  LSFT(KC_2),     LSFT(KC_3),  KC_DLR,   KC_PERC,  KC_CIRC,  KC_AMPR,         KC_ASTR,        KC_UNDS,  KC_PLUS,  KC_TRNS,
     KC_TRNS,  KC_TAB,   LSFT(KC_NUBS),  KC_LBRC,     KC_LCBR,  KC_LPRN,  KC_COLN,  LSFT(KC_QUOT),   LSFT(KC_BSLS),  KC_MINS,  KC_EQL,   KC_TRNS,
-    KC_CAPS, KC_CAPS,  KC_NUBS,        KC_RBRC,     KC_RCBR,  KC_RPRN,  KC_SCLN,  KC_QUOT,         KC_BSLS,        KC_GRV,   KC_SLSH,  KC_TRNS,
+    KC_CAPS,  KC_CAPS,  KC_NUBS,        KC_RBRC,     KC_RCBR,  KC_RPRN,  KC_SCLN,  KC_QUOT,         KC_BSLS,        KC_GRV,   KC_NO,    KC_TRNS,
     KC_TRNS,  KC_TRNS,  KC_TRNS,        KC_TRNS,     KC_NO,    KC_NO,    KC_NO,    TO(BASE_LAYER),  KC_TRNS,        KC_TRNS,  KC_TRNS,  KC_TRNS
   ),
 
@@ -58,7 +58,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [LEFT_TAP_LAYER] = LAYOUT_planck_grid(
     KC_TRNS,  KC_NO,    KC_F1,    KC_F2,    KC_F3,   KC_F4,   M_XTAB,   M_ISWIN,         M_ISCB,   KC_PSCR,  KC_INS,        KC_TRNS,
     KC_TRNS,  KC_NO,    KC_F5,    KC_F6,    KC_F7,   KC_F8,   KC_BRIU,  KC_VOLU,         KC_MPLY,  KC_MNXT,  LSFT(KC_INS),  KC_TRNS,
-    KC_TRNS,  KC_Z,     KC_F9,    KC_F10,   KC_F11,  KC_F12,  KC_BRID,  KC_VOLD,         KC_MUTE,  KC_MPRV,  LCTL(KC_INS),  KC_TRNS,
+    KC_TRNS,  KC_NO,    KC_F9,    KC_F10,   KC_F11,  KC_F12,  KC_BRID,  KC_VOLD,         KC_MUTE,  KC_MPRV,  LCTL(KC_INS),  KC_TRNS,
     KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_NO,   KC_NO,   KC_NO,    TO(BASE_LAYER),  KC_TRNS,  KC_TRNS,  KC_TRNS,       KC_TRNS
   ),
 
