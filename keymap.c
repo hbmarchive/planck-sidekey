@@ -44,7 +44,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [RIGHT_TAP_LAYER] = LAYOUT_planck_grid(
     KC_TRNS,  KC_EXLM,  LSFT(KC_2),     LSFT(KC_3),  KC_DLR,   KC_PERC,  KC_CIRC,  KC_AMPR,         KC_ASTR,        KC_UNDS,  KC_PLUS,  KC_TRNS,
     KC_TRNS,  KC_TAB,   LSFT(KC_NUBS),  KC_LBRC,     KC_LCBR,  KC_LPRN,  KC_COLN,  LSFT(KC_QUOT),   LSFT(KC_BSLS),  KC_MINS,  KC_EQL,   KC_TRNS,
-    KC_TRNS,  KC_CAPS,  KC_NUBS,        KC_RBRC,     KC_RCBR,  KC_RPRN,  KC_SCLN,  KC_QUOT,         KC_BSLS,        KC_GRV,   KC_SLSH,  KC_TRNS,
+    KC_CAPS, KC_CAPS,  KC_NUBS,        KC_RBRC,     KC_RCBR,  KC_RPRN,  KC_SCLN,  KC_QUOT,         KC_BSLS,        KC_GRV,   KC_SLSH,  KC_TRNS,
     KC_TRNS,  KC_TRNS,  KC_TRNS,        KC_TRNS,     KC_NO,    KC_NO,    KC_NO,    TO(BASE_LAYER),  KC_TRNS,        KC_TRNS,  KC_TRNS,  KC_TRNS
   ),
 
