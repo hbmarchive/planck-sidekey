@@ -15,14 +15,6 @@ GroupAdd, Explorer, ahk_class CabinetWClass
 +^!#2::SwitchTo("WindowsTerminal.exe", "wt.exe")
 +^!#3::SwitchTo("Teams.exe", "teams.exe")
 +^!#4::SwitchToExplorer()
-+^!#5::SwitchTo("mstsc.exe", "mstsc.exe")
-+^!#6::SwitchTo("Spotify.exe", "spotify.exe")
-
-; Minimize window
-+^!#m::
-WinGetActiveTitle, title
-WinMinimize, %title%
-return
 
 ; Maximize window
 +^!#j::
@@ -32,6 +24,12 @@ If (WinState)
  WinRestore, %title%
 else
  WinMaximize, %title%
+return
+
+; Minimize window
++^!#m::
+WinGetActiveTitle, title
+WinMinimize, %title%
 return
 
 ; Close window
