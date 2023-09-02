@@ -24,47 +24,6 @@ enum my_keycodes {
     M_ISWIN
 };
 
-// Tap-hold tap dances require custom types and functions.
-
-typedef enum {
-  TD_NONE,
-  TD_UNKNOWN,
-  TD_SINGLE_TAP,
-  TD_DOUBLE_TAP,
-  TD_HOLD
-} td_state_t;
-
-typedef struct {
-  td_state_t state;
-} td_tap_t;
-
-static td_tap_t td_left = {
-  .state = TD_NONE
-};
-
-static td_tap_t td_right = {
-  .state = TD_NONE
-};
-
-td_state_t td_get_state(tap_dance_state_t *state);
-
-void left_finished(tap_dance_state_t *state, void *user_data);
-void left_reset(tap_dance_state_t *state, void *user_data);
-void right_finished(tap_dance_state_t *state, void *user_data);
-void right_reset(tap_dance_state_t *state, void *user_data);
-
-// Tap Dance definitions
-
-enum {
-  TD_LEFT,
-  TD_RIGHT
-};
-
-tap_dance_action_t tap_dance_actions[] = {
-    [TD_LEFT] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, left_finished, left_reset),
-    [TD_RIGHT] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, right_finished, right_reset)
-};
-
 // Stores state of M_ALTT macro - true if we are currently tabbing between
 // windows.
 static bool m_altt_pressed = false;
@@ -72,21 +31,6 @@ static bool m_altt_pressed = false;
 // Toggle for keys that affect the the desktop - value can be changed in
 // function layer
 static bool m_is_chromebook = false;
-
-// Used to temporarily store the state of the mod keys.
-static uint8_t mod_state = 0;
-
-// State for managing shift backspace behaviour.
-static bool kc_del_registered = false;
-
-
-
-
-
-
-
-
-
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -128,47 +72,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-
   // Stop pressing the alt key once a key other than the alt-tab macro has been
   // pressed.
   if (keycode != M_ALTT && m_altt_pressed) {
     unregister_code(KC_LALT);
     m_altt_pressed = false;
   }
-
-  // Ensure shift is not pressed when the tap layers is active.
-  if (IS_LAYER_ON(LEFT_TAP_LAYER) || IS_LAYER_ON(RIGHT_TAP_LAYER)) {
-    switch (keycode) {
-      case KC_Z:
-      case KC_SLSH:
-        break;
-      default:
-        del_mods(MOD_MASK_SHIFT);
-        del_oneshot_mods(MOD_MASK_SHIFT);
-    }
-  }
-
-  mod_state = get_mods();
-
   switch (keycode) {
-    // Shift-backspace produces delete.
-    case KC_BSPC:
-      if (record->event.pressed) {
-        if (mod_state & MOD_MASK_SHIFT) {
-          del_mods(MOD_MASK_SHIFT);
-          register_code(KC_DEL);
-          kc_del_registered = true;
-          set_mods(mod_state);
-          return false;
-        }
-      } else {
-        if (kc_del_registered) {
-          unregister_code(KC_DEL);
-          kc_del_registered = false;
-          return false;
-        }
-      }
-      break;
     case M_ALTT:
       if (record->event.pressed) {
         if (!m_altt_pressed) {
@@ -313,136 +223,5 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
       break;
   }
-
   return true;
-}
-
-void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
-  if (!record->event.pressed) {
-    if (IS_LAYER_ON(LEFT_TAP_LAYER) && keycode != TD(TD_LEFT)) {
-      layer_off(LEFT_TAP_LAYER);
-    }
-  }
-  if (!record->event.pressed) {
-    if (IS_LAYER_ON(RIGHT_TAP_LAYER) && keycode != TD(TD_RIGHT)) {
-      layer_off(RIGHT_TAP_LAYER);
-    }
-  }
-}
-
-uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
-  switch (keycode) {
-    // Set the tapping term for the homerow mods.
-    case LCTL_T(KC_W):
-    case LALT_T(KC_F):
-    case LGUI_T(KC_P):
-    case LGUI_T(KC_L):
-    case LALT_T(KC_U):
-    case LCTL_T(KC_Y):
-      return TAPPING_TERM_MODS;
-    // Set the tapping term for tap dance keys.
-    case TD(TD_LEFT):
-    case TD(TD_RIGHT):
-      return TAPPING_TERM_TAP_DANCE;
-    default:
-      return TAPPING_TERM;
-  }
-}
-
-td_state_t td_get_state(tap_dance_state_t *state) {
-
-  if (state->count == 1) {
-    // If the keypress has been interrupted by another keypress or is no longer
-    // held down by the end of the tap time, then we know it was just a single
-    // tap.
-    if (state->interrupted || !state->pressed)
-      return TD_SINGLE_TAP;
-    else
-      // If it is still held at the end of the tap time, then it is a hold.
-      return TD_HOLD;
-  } else if (state->count > 1) {
-    // TD_DOUBLE_SINGLE_TAP is to distinguish between typing "pepper", and
-    // actually wanting a double tap action when hitting 'pp'. Suggested use
-    // case for this return value is when you want to send two keystrokes of the
-    // key, and not the 'double tap' action/macro.
-
-    // In the case where there has been more than one tap in the tap time, we
-    // have to make a judgement call. If the key is still held down we will
-    // assume it was a flutter and call it a hold.
-    if (state->pressed)
-      return TD_HOLD;
-    // If the keypress has finished or has been interrupted then we will assume
-    // that there was some actual fast typing going on and issue two taps, which
-    // will be the most common scenario.
-    if (state->interrupted || !state->pressed)
-      return TD_DOUBLE_TAP;
-  }
-
-  return TD_UNKNOWN;
-}
-
-void left_finished(tap_dance_state_t *state, void *user_data) {
-    td_left.state = td_get_state(state);
-    switch (td_left.state) {
-        case TD_SINGLE_TAP:
-          layer_on(LEFT_TAP_LAYER);
-          break;
-        case TD_DOUBLE_TAP:
-          register_code(KC_Z);
-          break;
-        case TD_HOLD:
-          layer_on(LEFT_HOLD_LAYER);
-          break;
-        default:
-          break;
-    }
-}
-
-void left_reset(tap_dance_state_t *state, void *user_data) {
-    switch (td_left.state) {
-        case TD_SINGLE_TAP:
-          // LEFT_TAP_LAYER turned off in post_process_record_user()
-          break;
-        case TD_DOUBLE_TAP:
-          unregister_code(KC_Z);
-          break;
-        case TD_HOLD:
-          layer_off(LEFT_HOLD_LAYER);
-        default:
-          break;
-    }
-    td_left.state = TD_NONE;
-}
-
-void right_finished(tap_dance_state_t *state, void *user_data) {
-    td_right.state = td_get_state(state);
-    switch (td_right.state) {
-        case TD_SINGLE_TAP:
-          layer_on(RIGHT_TAP_LAYER);
-          break;
-        case TD_DOUBLE_TAP:
-          register_code(KC_SLSH);
-          break;
-        case TD_HOLD:
-          layer_on(RIGHT_HOLD_LAYER);
-          break;
-        default:
-          break;
-    }
-}
-
-void right_reset(tap_dance_state_t *state, void *user_data) {
-    switch (td_right.state) {
-        case TD_SINGLE_TAP:
-          // RIGHT_TAP_LAYER turned off in post_process_record_user()
-          break;
-        case TD_DOUBLE_TAP:
-          unregister_code(KC_SLSH);
-          break;
-        case TD_HOLD:
-          layer_off(RIGHT_HOLD_LAYER);
-        default:
-          break;
-    }
-    td_right.state = TD_NONE;
 }

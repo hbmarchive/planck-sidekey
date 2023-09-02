@@ -52,14 +52,3 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Default tapping term
 #define TAPPING_TERM 190
 #define PERMISSIVE_HOLD
-#define TAPPING_TERM_PER_KEY
-
-// Tapping term for the homerow mod keys
-#define TAPPING_TERM_MODS 700
-
-// Tapping term for tap dance keys
-#define TAPPING_TERM_TAP_DANCE 160
-
-// Define the tap-hold tap dance action.
-#define ACTION_TAP_DANCE_TAP_HOLD(tap, hold) \
-    { .fn = {NULL, tap_dance_tap_hold_finished, tap_dance_tap_hold_reset}, .user_data = (void *)&((tap_dance_tap_hold_t){tap, hold, 0}), }
